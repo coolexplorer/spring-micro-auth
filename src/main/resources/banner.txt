@@ -1,0 +1,8 @@
+  ,---.              ,--.   ,--.
+ /  O  \  ,--.,--. ,-'  '-. |  ,---.
+|  .-.  | |  ||  | '-.  .-' |  .-.  |
+|  | |  | '  ''  '   |  |   |  | |  |
+`--' `--'  `----'    `--'   `--' `--'
+
+${server.title} ${server.version}
+Powered by Spring Boot ${spring-boot.version}
