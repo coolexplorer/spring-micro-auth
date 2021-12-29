@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: auth
+  devtools:
+    livereload:
+      enabled: true
+  messages:
+    basename: /messages
+    encoding: UTF-8
+  jwt:
+    secretKey: testSecret
+    tokenValidMinutes: 360
+
+# server
+server:
+  title: spring-micro-auth
+  version: '@project.version@'
+  port: 8080
+
+# logging
+logging:
+  file:
+    name: logs/auth.log
+  logback:
+    rollingpolicy:
+      file-name-pattern: logs/auth-%d{yyyy-MM-dd}.%i.log
+      max-file-size: 100MB
+      total-size-cap: 1GB
+      max-history: 7
+      clean-history-on-start: false
+  level:
+      org:
+        springframework:
+          security: INFO
+      io:
+        coolexplorer: DEBUG
