@@ -16,4 +16,14 @@ public class AccountServiceImpl implements AccountService {
     public Account create(Account account) {
         return accountRepository.save(account);
     }
+
+    @Override
+    public Account getAccount(String email) {
+        return accountRepository.findAccountByEmail(email);
+    }
+
+    @Override
+    public Account update(Account account) {
+        return accountRepository.save(account);
+    }
 }

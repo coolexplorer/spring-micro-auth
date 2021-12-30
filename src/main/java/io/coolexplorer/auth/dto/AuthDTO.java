@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
+
 public class AuthDTO {
     public AuthDTO() {
         throw new IllegalStateException("AuthDTO");
@@ -22,6 +24,23 @@ public class AuthDTO {
     @Schema(description = "Token Info")
     public static class TokenInfo {
         @Schema(example = "token.example")
-        private String token;
+        private String jwtToken;
+    }
+
+    @Getter
+    @Setter
+    @Accessors(chain = true)
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    @Schema(description = "Login request")
+    public static class LoginRequest {
+        @Schema(example = "email@email.com")
+        @NotBlank(message = "{login.email.empty}")
+        private String email;
+
+        @Schema(example = "mypassword")
+        @NotBlank(message = "{login.password.empty}")
+        private String password;
     }
 }

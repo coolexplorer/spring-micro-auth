@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -27,9 +29,10 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/account")
-    public AccountDTO.AccountInfo createAccount(@RequestBody AccountDTO.AccountCreationRequest request) {
+    public AccountDTO.AccountInfo createAccount(@Valid @RequestBody AccountDTO.AccountCreationRequest request) {
         Account account = modelMapper.map(request, Account.class);
         Account createdAccount = accountService.create(account);
-        return AccountDTO.AccountInfo.from(account, modelMapper);
+
+        return AccountDTO.AccountInfo.from(createdAccount, modelMapper);
     }
 }

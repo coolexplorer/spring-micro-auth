@@ -20,10 +20,18 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
         ObjectMapper objectMapper = new ObjectMapper();
+        ErrorResponse errorResponse;
+        final String expired = (String)request.getAttribute(ErrorCode.JWT_TOKEN_EXPIRED.toString());
 
-        ErrorResponse errorResponse = new ErrorResponse()
-                .setCode(ErrorCode.JWT_TOKEN_INVALID)
-                        .setDescription(errorMessageSourceAccessor.getMessage(ErrorCode.JWT_TOKEN_INVALID.getMessageKey()));
+        if (expired != null) {
+            errorResponse = new ErrorResponse()
+                    .setCode(ErrorCode.JWT_TOKEN_EXPIRED)
+                    .setDescription(errorMessageSourceAccessor.getMessage(ErrorCode.JWT_TOKEN_EXPIRED.getMessageKey()));
+        } else {
+            errorResponse = new ErrorResponse()
+                    .setCode(ErrorCode.JWT_TOKEN_INVALID)
+                    .setDescription(errorMessageSourceAccessor.getMessage(ErrorCode.JWT_TOKEN_INVALID.getMessageKey()));
+        }
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
