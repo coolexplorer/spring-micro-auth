@@ -24,6 +24,12 @@ public class TestAccountBuilder {
                 .setId(ID);
     }
 
+    public static Account accountWithToken() {
+        return baseAccount()
+                .setId(ID)
+                .setJwtToken(TestAuthBuilder.TOKEN);
+    }
+
     public static Account dtoAccount() {
         return baseAccount();
     }

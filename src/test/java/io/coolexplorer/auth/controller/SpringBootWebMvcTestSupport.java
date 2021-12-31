@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.xml.validation.Validator;
+import javax.validation.Validator;
 
 public class SpringBootWebMvcTestSupport {
     @Autowired
