@@ -11,6 +11,9 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.modelmapper.ModelMapper;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
 public class AccountDTO {
     private AccountDTO() {
         throw new IllegalStateException("AccountDTO");
@@ -50,13 +53,21 @@ public class AccountDTO {
     @ToString
     @Schema(description = "Account creation request")
     public static class AccountCreationRequest {
+        @Schema(example = "email@email.com")
+        @NotBlank(message = "{account.email.empty}")
+        @Email(message = "{account.invalid.email}")
+        private String email;
+
         @Schema(example = "John")
+        @NotBlank(message = "{account.first.name.empty}")
         private String firstName;
 
         @Schema(example = "Kim")
+        @NotBlank(message = "{account.last.name.empty}")
         private String lastName;
 
-        @Schema(example = "email@email.com")
-        private String email;
+        @Schema(example = "testPassword")
+        @NotBlank(message = "{account.password.empty}")
+        private String password;
     }
 }

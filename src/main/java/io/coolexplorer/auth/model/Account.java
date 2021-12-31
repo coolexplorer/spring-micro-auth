@@ -80,4 +80,10 @@ public class Account implements Serializable {
 
         return rolesAsString;
     }
+
+    public Account addRole(Role role) {
+        roles.add(role);
+
+        return this;
+    }
 }
