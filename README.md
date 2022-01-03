@@ -1,3 +1,5 @@
+[![dockeri.co](https://dockeri.co/image/coolexplorer/spring-micro-auth)](https://hub.docker.com/r/coolexplorer/spring-micro-auth)
+
 # spring-micro-auth
 In this project, I will create a simple Auth service which can create an account and get JwtToken after logged in. 
 This is the first project to make a microservice architecture using Spring boot framework.
