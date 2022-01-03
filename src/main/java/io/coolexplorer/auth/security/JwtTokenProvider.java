@@ -80,6 +80,10 @@ public class JwtTokenProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
+    public String getToken(HttpServletRequest request) {
+        return request.getHeader(AUTH_HEADER);
+    }
+
     public String resolveToken(HttpServletRequest request) {
         return request.getHeader(AUTH_HEADER).replace(AUTH_PREFIX, "");
     }
