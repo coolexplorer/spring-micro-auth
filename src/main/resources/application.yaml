@@ -17,7 +17,8 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: create-drop
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
   h2:
     console:
       enabled: true

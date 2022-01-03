@@ -51,7 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 After setting all, run your application and connect to `http://localhost:8080/swagger-ui.html`. 
 You can see a UI like below. 
 
-![swagger-ui](/Users/kimseunghwan/IdeaProjects/spring-micro-auth/images/swagger-ui.png)
+![swagger-ui](../images/swagger-ui.png)
 
 ## Authors
 Allen Kim - Initial work - [coolexplorer](https://github.com/coolexplorer)
