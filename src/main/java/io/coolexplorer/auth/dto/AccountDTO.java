@@ -70,4 +70,26 @@ public class AccountDTO {
         @NotBlank(message = "{account.password.empty}")
         private String password;
     }
+
+    @Getter
+    @Setter
+    @Accessors(chain = true)
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    @Schema(description = "Account update request")
+    public static class AccountUpdateRequest {
+        @Schema(example = "email@email.com")
+        @NotBlank(message = "{account.email.empty}")
+        @Email(message = "{account.invalid.email}")
+        private String email;
+
+        @Schema(example = "John")
+        @NotBlank(message = "{account.first.name.empty}")
+        private String firstName;
+
+        @Schema(example = "Kim")
+        @NotBlank(message = "{account.last.name.empty}")
+        private String lastName;
+    }
 }

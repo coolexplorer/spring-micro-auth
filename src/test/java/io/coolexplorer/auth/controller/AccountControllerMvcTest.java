@@ -2,6 +2,7 @@ package io.coolexplorer.auth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.coolexplorer.auth.dto.AccountDTO;
+import io.coolexplorer.auth.exceptions.user.UserNotFoundException;
 import io.coolexplorer.auth.model.Account;
 import io.coolexplorer.auth.security.JwtTokenProvider;
 import io.coolexplorer.auth.service.AccountService;
@@ -19,9 +20,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -67,6 +72,68 @@ public class AccountControllerMvcTest extends SpringBootWebMvcTestSupport {
                     .andDo(print())
                     .andExpect(status().is(HttpStatus.OK.value()))
                     .andExpect(content().json(expectedResponse));
+        }
+    }
+
+    @Nested
+    @DisplayName("Account Retrieve Test")
+    class AccountRetrieveTest {
+        @Test
+        @DisplayName("Success")
+        void testRetrieveAccount() throws Exception {
+            AccountDTO.AccountInfo accountInfo = AccountDTO.AccountInfo.from(defaultAccount, modelMapper);
+
+            when(accountService.getAccount(anyLong())).thenReturn(defaultAccount);
+
+            String expectedResponse = objectMapper.writeValueAsString(accountInfo);
+
+            mockMvc.perform(get("/api/v1/account/1")
+                            .with(user("test").password("1234").roles("USER")))
+                    .andDo(print())
+                    .andExpect(status().is(HttpStatus.OK.value()))
+                    .andExpect(content().json(expectedResponse));
+        }
+    }
+
+    @Nested
+    @DisplayName("Account Update Test")
+    class AccountUpdateTest {
+        @Test
+        @DisplayName("Success")
+        void testUpdateAccount() throws Exception {
+            AccountDTO.AccountInfo accountInfo = AccountDTO.AccountInfo.from(defaultAccount, modelMapper);
+            AccountDTO.AccountUpdateRequest updateRequest = modelMapper.map(dtoAccount, AccountDTO.AccountUpdateRequest.class);
+
+            String payload = objectMapper.writeValueAsString(updateRequest);
+            String expectedResponse = objectMapper.writeValueAsString(accountInfo);
+
+            when(accountService.getAccount(anyLong())).thenReturn(defaultAccount);
+            when(accountService.update(any())).thenReturn(defaultAccount);
+
+            mockMvc.perform(put("/api/v1/account/1")
+                            .with(user("test").password("1234").roles("USER"))
+                            .content(payload)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().is(HttpStatus.OK.value()))
+                    .andExpect(content().json(expectedResponse));
+        }
+    }
+
+    @Nested
+    @DisplayName("Account Deletion Test")
+    class AccountDeletionTest {
+        @Test
+        @DisplayName("Success")
+        void testDeletionAccount() throws Exception {
+            when(accountService.getAccount(anyLong())).thenReturn(defaultAccount);
+
+            accountService.delete(TestAccountBuilder.ID);
+
+            mockMvc.perform(delete("/api/v1/account/1")
+                            .with(user("test").password("1234").roles("USER")))
+                    .andDo(print())
+                    .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
         }
     }
 }

@@ -1,5 +1,7 @@
 package io.coolexplorer.auth.service.impl;
 
+import io.coolexplorer.auth.exceptions.user.UserDataIntegrityViolationException;
+import io.coolexplorer.auth.exceptions.user.UserNotFoundException;
 import io.coolexplorer.auth.model.Account;
 import io.coolexplorer.auth.repository.AccountRepository;
 import io.coolexplorer.auth.service.AccountService;
@@ -17,7 +19,7 @@ public class AccountServiceImpl implements AccountService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Account create(Account account) {
+    public Account create(Account account) throws UserDataIntegrityViolationException {
         account.setPassword(passwordEncoder.encode(account.getPassword()));
 
         try {
@@ -25,11 +27,8 @@ public class AccountServiceImpl implements AccountService {
         } catch (DataIntegrityViolationException e) {
             LOGGER.error("Account Creation DataIntegrityViolationException {}", e);
 
-            // TODO: Add custom exception
+            throw new UserDataIntegrityViolationException();
         }
-
-        // TODO: Delete this line when throw custom exception
-        return accountRepository.save(account);
     }
 
     @Override
@@ -38,7 +37,29 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Account getAccount(Long id) throws UserNotFoundException {
+        Account account = accountRepository.findById(id).orElse(null);
+
+        if (account == null) {
+            throw new UserNotFoundException();
+        }
+
+        return account;
+    }
+
+    @Override
     public Account update(Account account) {
         return accountRepository.save(account);
+    }
+
+    @Override
+    public void delete(Long id) throws UserNotFoundException {
+        Account account = accountRepository.findById(id).orElse(null);
+
+        if (account == null) {
+            throw new UserNotFoundException();
+        }
+
+        accountRepository.deleteById(id);
     }
 }
