@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -57,7 +58,7 @@ public class AuthServiceImplTest {
         @Test
         @DisplayName("Success")
         void testLogin() {
-            when(accountService.getAccount(any())).thenReturn(defaultAccount);
+            when(accountService.getAccount(anyString())).thenReturn(defaultAccount);
             when(jwtTokenProvider.createJwtToken(any())).thenReturn("testToken");
             when(accountService.update(any())).thenReturn(defaultAccount);
 

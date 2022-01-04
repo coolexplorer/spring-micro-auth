@@ -1,5 +1,7 @@
 package io.coolexplorer.auth.service.impl;
 
+import io.coolexplorer.auth.exceptions.user.UserDataIntegrityViolationException;
+import io.coolexplorer.auth.exceptions.user.UserNotFoundException;
 import io.coolexplorer.auth.model.Account;
 import io.coolexplorer.auth.repository.AccountRepository;
 import io.coolexplorer.auth.service.AccountService;
@@ -14,8 +16,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -48,7 +54,7 @@ public class AccountServiceImplTest {
     class AccountCreationTest {
         @Test
         @DisplayName("Success")
-        void testCreateAccount() {
+        void testCreateAccount() throws UserDataIntegrityViolationException {
             when(accountRepository.save(any())).thenReturn(defaultAccount);
 
             Account createdAccount = accountService.create(dtoAccount);
@@ -82,6 +88,20 @@ public class AccountServiceImplTest {
             Account updatedAccount = accountService.update(dtoAccount);
 
             assertThat(updatedAccount).isNotNull().isEqualTo(defaultAccount);
+        }
+    }
+
+    @Nested
+    @DisplayName("Account Deletion Test")
+    class AccountDeletionTest {
+        @Test
+        @DisplayName("Success")
+        void testDeletionAccount() throws UserNotFoundException {
+            when(accountRepository.findById(anyLong())).thenReturn(Optional.of(defaultAccount));
+
+            accountService.delete(TestAccountBuilder.ID);
+
+            verify(accountRepository).deleteById(TestAccountBuilder.ID);
         }
     }
 }
