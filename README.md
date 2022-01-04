@@ -5,6 +5,8 @@ In this project, I will create a simple Auth service which can create an account
 This is the first project to make a microservice architecture using Spring boot framework.
 This project is getting evolved as times go on. 
 
+## Microservice Architecture
+![spring-micro-architecture](./images/microservice-architecture.png)
 
 ## Authors
 Allen Kim - Initial work - [coolexplorer](https://github.com/coolexplorer)
