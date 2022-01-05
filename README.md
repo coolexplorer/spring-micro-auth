@@ -1,4 +1,5 @@
 [![dockeri.co](https://dockeri.co/image/coolexplorer/spring-micro-auth)](https://hub.docker.com/r/coolexplorer/spring-micro-auth)
+
 [![CodeQL](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/codeql-analysis.yml)
 [![Maven Package](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/maven-publish.yml)
 [![docker](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/docker.yml/badge.svg)](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/docker.yml)
