@@ -31,7 +31,7 @@ jobs:
         id: meta
         uses: crazy-max/ghaction-docker-meta@v2
         with:
-          images: coolexplorer/py-auth
+          images: coolexplorer/spring-micro-auth
       -
         name: Login to DockerHub
         if: github.event_name != 'pull_request'
