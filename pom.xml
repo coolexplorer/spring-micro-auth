@@ -57,6 +57,10 @@
 
         <jjwt.version>0.9.1</jjwt.version>
         <jasypt.version>3.0.3</jasypt.version>
+
+        <!-- Jgit Configuration -->
+        <git.user> </git.user>
+        <git.password> </git.password>
     </properties>
 
     <dependencyManagement>
@@ -196,6 +200,28 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>external.atlassian.jgitflow</groupId>
+                <artifactId>jgitflow-maven-plugin</artifactId>
+                <version>1.0-m5.1</version>
+                <configuration>
+                    <!-- For specific plugin configuration options,
+                    see the Goals documentation page -->
+                    <username>${git.user}</username>
+                    <password>${git.password}</password>
+                    <flowInitContext>
+                        <masterBranchName>master</masterBranchName>
+                        <developBranchName>develop</developBranchName>
+                    </flowInitContext>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <enableSshAgent>true</enableSshAgent>
+                    <noDeploy>true</noDeploy>
+                    <pushReleases>true</pushReleases>
+                    <pullDevelop>true</pullDevelop>
+                    <pullMaster>true</pullMaster>
+                    <scmCommentPrefix>[RELEASE] </scmCommentPrefix>
+                </configuration>
             </plugin>
         </plugins>
     </build>
