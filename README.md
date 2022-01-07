@@ -12,6 +12,11 @@ This project is getting evolved as times go on.
 ## Microservice Architecture
 ![spring-micro-architecture](./images/microservice-architecture.png)
 
+## Deployment
+This project is deployed by Jenkins and ArgoCD. 
+
+![spring-mirco-deployment](./images/spring-micro-deployment.png)
+
 ## Authors
 Allen Kim - Initial work - [coolexplorer](https://github.com/coolexplorer)
 
