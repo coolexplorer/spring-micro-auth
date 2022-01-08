@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -41,8 +40,8 @@ public class JwtTokenProvider {
         this.tokenValidMinutes = tokenValidMinutes;
     }
 
-    public String createJwtToken(String username, Set<String> roles) {
-        Claims claims = Jwts.claims().setSubject(username);
+    public String createJwtToken(String email, Set<String> roles) {
+        Claims claims = Jwts.claims().setSubject(email);
         claims.put("roles", roles);
 
         Date now = new Date();
@@ -70,13 +69,13 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        String username = getUsername(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        String email = getEmail(token);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public String getUsername(String token) {
+    public String getEmail(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
@@ -91,7 +90,7 @@ public class JwtTokenProvider {
     public boolean isValid(String jwtToken, HttpServletRequest request) {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
-            SecureAccount secureAccount = (SecureAccount) userDetailsService.loadUserByUsername(getUsername(jwtToken));
+            SecureAccount secureAccount = (SecureAccount) userDetailsService.loadUserByUsername(getEmail(jwtToken));
             String token = secureAccount.getJwtToken();
 
             boolean isSameToken = token != null && token.equals(jwtToken);
