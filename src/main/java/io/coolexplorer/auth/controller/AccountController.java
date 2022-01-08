@@ -35,7 +35,9 @@ public class AccountController {
 
     @Operation(summary = "Create Account", description = "Create Account", responses = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountDTO.AccountInfo.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(example = ""))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PostMapping("/account")
     public AccountDTO.AccountInfo createAccount(@Valid @RequestBody AccountDTO.AccountCreationRequest request) throws UserDataIntegrityViolationException {
@@ -47,7 +49,9 @@ public class AccountController {
 
     @Operation(summary = "Create Account", description = "Create Account", responses = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountDTO.AccountInfo.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(example = ""))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping("/account/{id}")
     public AccountDTO.AccountInfo getAccount(@Valid @PathVariable("id") Long id) throws UserNotFoundException {
@@ -58,7 +62,9 @@ public class AccountController {
 
     @Operation(summary = "Create Account", description = "Create Account", responses = {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountDTO.AccountInfo.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(example = ""))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @PutMapping("/account/{id}")
     public AccountDTO.AccountInfo updateAccount(@Valid @PathVariable Long id, @Valid @RequestBody AccountDTO.AccountUpdateRequest request) throws UserNotFoundException {
@@ -71,8 +77,10 @@ public class AccountController {
     }
 
     @Operation(summary = "Create Account", description = "Create Account", responses = {
-            @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountDTO.AccountInfo.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "204", description = "No Content", content = @Content(schema = @Schema(example = ""))),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(example = ""))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @DeleteMapping("/account/{id}")
     public ResponseEntity<String> deleteAccount(@Valid @PathVariable("id") Long id) throws UserNotFoundException {
