@@ -47,6 +47,13 @@ server:
   version: '@project.version@'
   port: 8080
 
+# kafka
+kafka:
+  bootstrap:
+    addresses: localhost:31090,localhost:31091,localhost:31092
+  consumer:
+    groupId: auth
+
 # logging
 logging:
   file:

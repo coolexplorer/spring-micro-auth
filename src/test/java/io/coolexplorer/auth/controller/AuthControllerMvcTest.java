@@ -66,7 +66,6 @@ public class AuthControllerMvcTest extends SpringBootWebMvcTestSupport {
             String expectedResponse = objectMapper.writeValueAsString(accountInfo);
 
             mockMvc.perform(post("/api/v1/signup")
-                            .with(user("test").password("1234").roles("USER"))
                             .content(payload)
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
@@ -93,7 +92,6 @@ public class AuthControllerMvcTest extends SpringBootWebMvcTestSupport {
             when(authService.login(any(), any())).thenReturn(accountWithToken);
 
             mockMvc.perform(post("/api/v1/login")
-                        .with(user("test").password("1234").roles("USER"))
                         .content(payload)
                         .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())

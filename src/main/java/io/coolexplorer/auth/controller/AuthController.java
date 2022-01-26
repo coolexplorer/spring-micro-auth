@@ -3,10 +3,12 @@ package io.coolexplorer.auth.controller;
 import io.coolexplorer.auth.dto.AccountDTO;
 import io.coolexplorer.auth.dto.AuthDTO;
 import io.coolexplorer.auth.dto.ErrorResponse;
+import io.coolexplorer.auth.message.SessionMessage;
 import io.coolexplorer.auth.exceptions.user.UserDataIntegrityViolationException;
 import io.coolexplorer.auth.exceptions.user.UserNotFoundException;
 import io.coolexplorer.auth.model.Account;
 import io.coolexplorer.auth.service.AuthService;
+import io.coolexplorer.auth.service.SessionMessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,6 +33,7 @@ import javax.validation.Valid;
 @RequestMapping("/api/v1")
 public class AuthController {
     private final AuthService authService;
+    private final SessionMessageService sessionMessageService;
     private final ModelMapper modelMapper;
 
     @Operation(summary = "Create Account", description = "Create Account", responses = {
@@ -41,6 +44,11 @@ public class AuthController {
     public AccountDTO.AccountInfo createAccount(@Valid @RequestBody AccountDTO.AccountCreationRequest request) throws UserDataIntegrityViolationException {
         Account account = modelMapper.map(request, Account.class);
         Account createdAccount = authService.signup(account);
+
+        SessionMessage.CreateMessage sessionData = new SessionMessage.CreateMessage()
+                .setAccountId(1L)
+                .setValues("{\"loginCount\":10}");
+        sessionMessageService.createSession(sessionData);
 
         return AccountDTO.AccountInfo.from(createdAccount, modelMapper);
     }
