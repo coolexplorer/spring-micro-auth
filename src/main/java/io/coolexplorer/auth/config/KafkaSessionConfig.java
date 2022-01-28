@@ -64,14 +64,14 @@ public class KafkaSessionConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, String> consumerFactory() {
+    public ConsumerFactory<String, String> sessionConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumeProperties());
     }
 
     @Bean
-    public ReplyingKafkaTemplate<String, Object, String> replyingKafkaTemplate(
+    public ReplyingKafkaTemplate<String, Object, String> sessionReplyingKafkaTemplate(
             @Qualifier("sessionProducerFactory") ProducerFactory<String, Object> pf,
-            KafkaMessageListenerContainer<String, String> container) {
+            @Qualifier("sessionReplyContainer") KafkaMessageListenerContainer<String, String> container) {
         return new ReplyingKafkaTemplate<>(pf, container);
     }
 
@@ -81,15 +81,17 @@ public class KafkaSessionConfig {
     }
 
     @Bean
-    public KafkaMessageListenerContainer<String, String> replyContainer(ConsumerFactory<String, String> cf) {
+    public KafkaMessageListenerContainer<String, String> sessionReplyContainer(
+            @Qualifier("sessionConsumerFactory") ConsumerFactory<String, String> cf
+    ) {
         ContainerProperties containerProperties = new ContainerProperties(SessionTopic.TOPIC_REPLY_SESSION);
         return new KafkaMessageListenerContainer<>(cf, containerProperties);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory() {
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> sessionKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
+        factory.setConsumerFactory(sessionConsumerFactory());
         factory.setReplyTemplate(kafkaSessionTemplate());
         return factory;
     }

@@ -18,7 +18,6 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -28,7 +27,7 @@ import java.util.concurrent.TimeoutException;
 @RequiredArgsConstructor
 public class SessionMessageServiceImpl implements SessionMessageService {
     private final KafkaTemplate<String, Object> kafkaSessionTemplate;
-    private final ReplyingKafkaTemplate<String, Object, String> replyingKafkaTemplate;
+    private final ReplyingKafkaTemplate<String, Object, String> sessionReplyingKafkaTemplate;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -45,7 +44,7 @@ public class SessionMessageServiceImpl implements SessionMessageService {
         LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_RETRIEVE_JWT_TOKEN, message);
 
         ProducerRecord<String, Object> record = new ProducerRecord<>(SessionTopic.TOPIC_RETRIEVE_SESSION, message);
-        RequestReplyFuture<String, Object, String> replyFuture = replyingKafkaTemplate.sendAndReceive(record);
+        RequestReplyFuture<String, Object, String> replyFuture = sessionReplyingKafkaTemplate.sendAndReceive(record);
 
         SendResult<String, Object> sendResult = replyFuture.getSendFuture().get(10, TimeUnit.SECONDS);
         ConsumerRecord<String, String> consumerRecord = replyFuture.get(10, TimeUnit.SECONDS);

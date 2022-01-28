@@ -28,7 +28,7 @@ import java.util.concurrent.TimeoutException;
 @Service
 public class JwtTokenMessageServiceImpl implements JwtTokenMessageService {
     private final KafkaTemplate<String, Object> kafkaJwtTokenTemplate;
-    private final ReplyingKafkaTemplate<String, Object, String> replyingKafkaTemplate;
+    private final ReplyingKafkaTemplate<String, Object, String> jwtTokenReplyingKafkaTemplate;
     private final ObjectMapper objectMapper;
     private final ModelMapper modelMapper;
 
@@ -50,7 +50,7 @@ public class JwtTokenMessageServiceImpl implements JwtTokenMessageService {
         LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_RETRIEVE_JWT_TOKEN, message);
 
         ProducerRecord<String, Object> record = new ProducerRecord<>(JwtTokenTopic.TOPIC_RETRIEVE_JWT_TOKEN, message);
-        RequestReplyFuture<String, Object, String> replyFuture = replyingKafkaTemplate.sendAndReceive(record);
+        RequestReplyFuture<String, Object, String> replyFuture = jwtTokenReplyingKafkaTemplate.sendAndReceive(record);
 
         SendResult<String, Object> sendResult = replyFuture.getSendFuture().get(10, TimeUnit.SECONDS);
         ConsumerRecord<String, String> consumerRecord = replyFuture.get(10, TimeUnit.SECONDS);
