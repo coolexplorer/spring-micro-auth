@@ -1,6 +1,5 @@
 package io.coolexplorer.auth.config;
 
-import io.coolexplorer.auth.message.SessionMessage;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaSessionProducerConfig {
+public class KafkaJwtTokenConfig {
     private final String bootStrapAddresses;
 
-    public KafkaSessionProducerConfig(@Value("${kafka.bootstrap.addresses}") String bootStrapAddresses) {
+    public KafkaJwtTokenConfig(@Value("${kafka.bootstrap.addresses}") String bootStrapAddresses) {
         this.bootStrapAddresses = bootStrapAddresses;
     }
 
@@ -31,12 +30,13 @@ public class KafkaSessionProducerConfig {
     }
 
     @Bean
-    public ProducerFactory<String, Object> sessionProducerFactory() {
+    public ProducerFactory<String, Object> jwtTokenProducerFactory() {
         return new DefaultKafkaProducerFactory<>(getJsonProperties());
     }
 
     @Bean
-    public KafkaTemplate<String, Object> kafkaSessionTemplate() {
-        return new KafkaTemplate<>(sessionProducerFactory());
+    public KafkaTemplate<String, Object> kafkaJwtTokenTemplate() {
+        return new KafkaTemplate<>(jwtTokenProducerFactory());
     }
+
 }
