@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -58,6 +59,8 @@ public class RestResponseEntityExceptionHandler {
 
         if (e instanceof BadCredentialsException) {
             errorResponse = createErrorMessage(ErrorCode.AUTH_BAD_CREDENTIALS);
+        } else if (e instanceof UsernameNotFoundException) {
+            errorResponse = createErrorMessage(ErrorCode.AUTH_USER_NOT_FOUND);
         }
 
         return errorResponse;
