@@ -3,6 +3,7 @@ package io.coolexplorer.auth.security;
 import io.coolexplorer.auth.enums.ErrorCode;
 import io.coolexplorer.auth.model.Account;
 import io.coolexplorer.auth.model.SecureAccount;
+import io.coolexplorer.auth.utils.DateTimeUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Set;
@@ -41,29 +43,31 @@ public class JwtTokenProvider {
     }
 
     public String createJwtToken(String email, Set<String> roles) {
+        Date now = new Date();
+        Date expiredDate = DateUtils.addMinutes(now, tokenValidMinutes);
+
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("roles", roles);
-
-        Date now = new Date();
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(DateUtils.addMinutes(now, tokenValidMinutes))
+                .setExpiration(expiredDate)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
     public String createJwtToken(Account account) {
+        Date now = new Date();
+        Date expiredDate = DateUtils.addMinutes(now, tokenValidMinutes);
+
         Claims claims = Jwts.claims().setSubject(account.getEmail());
         claims.put("roles", account.getRolesAsString());
-
-        Date now = new Date();
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(DateUtils.addMinutes(now, tokenValidMinutes))
+                .setExpiration(expiredDate)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
@@ -77,6 +81,10 @@ public class JwtTokenProvider {
 
     public String getEmail(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public Date getExpiredDate(String token) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
     }
 
     public String getToken(HttpServletRequest request) {

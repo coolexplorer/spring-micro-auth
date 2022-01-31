@@ -9,7 +9,7 @@ spring:
     encoding: UTF-8
   jwt:
     secretKey: testSecret
-    tokenValidMinutes: 360
+    tokenValidMinutes: 5
   jpa:
     show-sql: true
     properties:
