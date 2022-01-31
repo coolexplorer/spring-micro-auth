@@ -3,18 +3,24 @@ package io.coolexplorer.auth.service.impl;
 import io.coolexplorer.auth.exceptions.user.UserDataIntegrityViolationException;
 import io.coolexplorer.auth.exceptions.user.UserNotFoundException;
 import io.coolexplorer.auth.model.Account;
+import io.coolexplorer.auth.model.SecureAccount;
 import io.coolexplorer.auth.repository.AccountRepository;
 import io.coolexplorer.auth.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class AccountServiceImpl implements AccountService {
+public class AccountServiceImpl implements AccountService, UserDetailsService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -61,5 +67,19 @@ public class AccountServiceImpl implements AccountService {
         }
 
         accountRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        LOGGER.debug("loadUserByUsername username : {}", username);
+
+        Account account = getAccount(username);
+        Optional<Account> optionalAccount = Optional.ofNullable(account);
+
+        if (optionalAccount.isPresent()) {
+            return new SecureAccount(optionalAccount.get());
+        } else {
+            throw new UsernameNotFoundException("Email is not found.");
+        }
     }
 }
