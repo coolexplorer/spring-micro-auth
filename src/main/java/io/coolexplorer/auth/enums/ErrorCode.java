@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
     AUTH_USER_NOT_FOUND("error.auth.user.not.found"),
+    AUTH_BAD_CREDENTIALS("error.auth.bad.credentials"),
     JWT_TOKEN_EXPIRED("error.jwt.token.expired"),
     JWT_TOKEN_INVALID("error.jwt.token.invalid"),
     USER_NOT_FOUND("error.user.not.found"),
