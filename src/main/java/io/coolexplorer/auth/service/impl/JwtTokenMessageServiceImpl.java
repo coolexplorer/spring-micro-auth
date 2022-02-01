@@ -2,11 +2,14 @@ package io.coolexplorer.auth.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jwt.util.DateUtils;
 import io.coolexplorer.auth.message.JwtTokenMessage;
 import io.coolexplorer.auth.model.Account;
+import io.coolexplorer.auth.security.JwtTokenProvider;
 import io.coolexplorer.auth.service.JwtTokenMessageService;
 import io.coolexplorer.auth.service.callback.JwtTokenFutureCallback;
 import io.coolexplorer.auth.topic.JwtTokenTopic;
+import io.coolexplorer.auth.utils.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -19,6 +22,7 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -30,13 +34,16 @@ public class JwtTokenMessageServiceImpl implements JwtTokenMessageService {
     private final KafkaTemplate<String, Object> kafkaJwtTokenTemplate;
     private final ReplyingKafkaTemplate<String, Object, String> jwtTokenReplyingKafkaTemplate;
     private final ObjectMapper objectMapper;
-    private final ModelMapper modelMapper;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public void creteJwtTokenCache(Account account) {
+        Date expiredDate = jwtTokenProvider.getExpiredDate(account.getJwtToken());
+
         JwtTokenMessage.CreateMessage createMessage = new JwtTokenMessage.CreateMessage();
         createMessage.setAccountId(account.getId());
         createMessage.setJwtToken(account.getJwtToken());
+        createMessage.setExpiration(DateTimeUtils.getSecondsBetweenDates(new Date(), expiredDate));
 
         LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_CREATE_JWT_TOKEN, createMessage);
 
@@ -63,9 +70,12 @@ public class JwtTokenMessageServiceImpl implements JwtTokenMessageService {
 
     @Override
     public void updateJwtTokenCache(Account account) {
+        Date expiredDate = jwtTokenProvider.getExpiredDate(account.getJwtToken());
+
         JwtTokenMessage.UpdateMessage updateMessage = new JwtTokenMessage.UpdateMessage();
         updateMessage.setAccountId(account.getId());
         updateMessage.setJwtToken(account.getJwtToken());
+        updateMessage.setExpiration(DateTimeUtils.getSecondsBetweenDates(new Date(), expiredDate));
 
         LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_UPDATE_JWT_TOKEN, updateMessage);
 
