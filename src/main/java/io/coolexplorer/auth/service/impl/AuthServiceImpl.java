@@ -3,11 +3,14 @@ package io.coolexplorer.auth.service.impl;
 import io.coolexplorer.auth.enums.ExceptionCode;
 import io.coolexplorer.auth.exceptions.user.UserDataIntegrityViolationException;
 import io.coolexplorer.auth.exceptions.user.UserNotFoundException;
+import io.coolexplorer.auth.message.JwtTokenMessage;
 import io.coolexplorer.auth.model.Account;
 import io.coolexplorer.auth.security.JwtTokenProvider;
 import io.coolexplorer.auth.service.AccountService;
 import io.coolexplorer.auth.service.AuthService;
+import io.coolexplorer.auth.service.JwtTokenMessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -33,12 +37,14 @@ public class AuthServiceImpl implements AuthService {
             throw new UsernameNotFoundException(errorMessageSourceAccessor.getMessage(ExceptionCode.USERNAME_NOT_FOUND.getMessageKey()));
         }
 
-        if (passwordEncoder.matches(password, account.getPassword())) {
+        if (!passwordEncoder.matches(password, account.getPassword())) {
             throw new BadCredentialsException(errorMessageSourceAccessor.getMessage(ExceptionCode.BAD_CREDENTIALS.getMessageKey()));
         }
 
         account.setJwtToken(jwtTokenProvider.createJwtToken(account));
         account.setLastLogin(LocalDateTime.now());
+
+        LOGGER.debug("Account : {}", account);
 
         return accountService.update(account);
     }

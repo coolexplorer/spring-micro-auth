@@ -1,5 +1,7 @@
 package io.coolexplorer.auth.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.coolexplorer.auth.model.Account;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +15,7 @@ import org.modelmapper.ModelMapper;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 public class AccountDTO {
     private AccountDTO() {
@@ -26,7 +29,7 @@ public class AccountDTO {
     @NoArgsConstructor
     @ToString
     @Schema(description = "Account Info")
-    @JsonPropertyOrder()
+    @JsonPropertyOrder({"id", "email", "firstname", "lastname", "createdDate", "modifiedDate", "lastLogin"})
     public static class AccountInfo {
         @Schema(example = "1L")
         private Long id;
@@ -39,6 +42,21 @@ public class AccountDTO {
 
         @Schema(example = "Kim")
         private String lastName;
+
+        @Schema(example = "2021-01-01T00:00:00")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private LocalDateTime createdDate;
+
+        @Schema(example = "2021-01-01T00:00:00")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private LocalDateTime modifiedDate;
+
+        @Schema(example = "2021-01-01T00:00:00")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private LocalDateTime lastLogin;
 
         public static AccountInfo from(Account account, ModelMapper modelMapper) {
             return modelMapper.map(account, AccountInfo.class);

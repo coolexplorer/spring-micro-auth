@@ -1,12 +1,18 @@
 package io.coolexplorer.auth.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.coolexplorer.auth.dto.AccountDTO;
 import io.coolexplorer.auth.dto.AuthDTO;
 import io.coolexplorer.auth.dto.ErrorResponse;
+import io.coolexplorer.auth.message.JwtTokenMessage;
+import io.coolexplorer.auth.message.SessionMessage;
 import io.coolexplorer.auth.exceptions.user.UserDataIntegrityViolationException;
 import io.coolexplorer.auth.exceptions.user.UserNotFoundException;
 import io.coolexplorer.auth.model.Account;
+import io.coolexplorer.auth.service.AccountService;
 import io.coolexplorer.auth.service.AuthService;
+import io.coolexplorer.auth.service.JwtTokenMessageService;
+import io.coolexplorer.auth.service.SessionMessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,12 +31,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
 public class AuthController {
     private final AuthService authService;
+    private final AccountService accountService;
+    private final JwtTokenMessageService jwtTokenMessageService;
     private final ModelMapper modelMapper;
 
     @Operation(summary = "Create Account", description = "Create Account", responses = {
@@ -38,7 +48,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/signup")
-    public AccountDTO.AccountInfo createAccount(@Valid @RequestBody AccountDTO.AccountCreationRequest request) throws UserDataIntegrityViolationException {
+    public AccountDTO.AccountInfo createAccount(@Valid @RequestBody AccountDTO.AccountCreationRequest request) throws UserDataIntegrityViolationException, ExecutionException, JsonProcessingException, InterruptedException, TimeoutException {
         Account account = modelMapper.map(request, Account.class);
         Account createdAccount = authService.signup(account);
 
@@ -52,6 +62,7 @@ public class AuthController {
     @PostMapping("/login")
     public AuthDTO.TokenInfo login(@Valid @RequestBody AuthDTO.LoginRequest request) {
         Account account = authService.login(request.getEmail(), request.getPassword());
+        jwtTokenMessageService.creteJwtTokenCache(account);
 
         return new AuthDTO.TokenInfo(account.getJwtToken());
     }
@@ -66,6 +77,7 @@ public class AuthController {
     public AuthDTO.TokenInfo refreshToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Account account = authService.refreshToken(authentication.getName());
+        jwtTokenMessageService.updateJwtTokenCache(account);
 
         return new AuthDTO.TokenInfo(account.getJwtToken());
     }
@@ -79,7 +91,9 @@ public class AuthController {
     @DeleteMapping("/auth/token")
     public ResponseEntity<String> deleteToken() throws UserNotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Account account = accountService.getAccount(authentication.getName());
         authService.deleteToken(authentication.getName());
+        jwtTokenMessageService.deleteJwtTokenCache(account.getId());
 
         return new ResponseEntity<>("", HttpStatus.NO_CONTENT);
     }

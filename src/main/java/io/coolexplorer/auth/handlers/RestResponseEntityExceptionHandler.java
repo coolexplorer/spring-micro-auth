@@ -10,6 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -37,6 +40,27 @@ public class RestResponseEntityExceptionHandler {
             errorResponse = createErrorMessage(ErrorCode.USER_NOT_FOUND);
         } else if (e instanceof UserDataIntegrityViolationException) {
             errorResponse = createErrorMessage(ErrorCode.USER_DATA_VIOLATION);
+        }
+
+        return errorResponse;
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    protected ResponseEntity<ErrorResponse> handlerAuthenticationException(AuthenticationException e) {
+        LOGGER.error(e.getLocalizedMessage(), e);
+
+        ErrorResponse response = createAuthenticationReponse(e);
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    private ErrorResponse createAuthenticationReponse(AuthenticationException e) {
+        ErrorResponse errorResponse = null;
+
+        if (e instanceof BadCredentialsException) {
+            errorResponse = createErrorMessage(ErrorCode.AUTH_BAD_CREDENTIALS);
+        } else if (e instanceof UsernameNotFoundException) {
+            errorResponse = createErrorMessage(ErrorCode.AUTH_USER_NOT_FOUND);
         }
 
         return errorResponse;

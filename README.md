@@ -3,6 +3,7 @@
 [![CodeQL](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/codeql-analysis.yml)
 [![Maven Package](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/maven-publish.yml)
 [![docker](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/docker.yml/badge.svg)](https://github.com/coolexplorer/spring-micro-auth/actions/workflows/docker.yml)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/coolexplorer/spring-micro-auth)
 
 # spring-micro-auth
 In this project, I will create a simple Auth service which can create an account and get JwtToken after logged in. 
