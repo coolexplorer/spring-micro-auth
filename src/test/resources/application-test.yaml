@@ -40,8 +40,6 @@ spring:
       mode: always
       continue-on-error: false
       platform: h2
-  kafka:
-    bootstrap-servers: ${spring.embedded.kafka.brokers}
 
 # server
 server:
@@ -52,7 +50,7 @@ server:
 # kafka
 kafka:
   bootstrap:
-    addresses: localhost:31090,localhost:31091,localhost:31092
+    addresses: ${spring.embedded.kafka.brokers}
   consumer:
     groupId: auth
   test:

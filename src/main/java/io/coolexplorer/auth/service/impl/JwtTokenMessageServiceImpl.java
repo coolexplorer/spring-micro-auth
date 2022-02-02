@@ -36,12 +36,9 @@ public class JwtTokenMessageServiceImpl implements JwtTokenMessageService {
 
     @Override
     public void creteJwtTokenCache(Account account) {
-        Date expiredDate = jwtTokenProvider.getExpiredDate(account.getJwtToken());
+        Date expireDate = jwtTokenProvider.getExpiredDate(account.getJwtToken());
 
-        JwtTokenMessage.CreateMessage createMessage = new JwtTokenMessage.CreateMessage();
-        createMessage.setAccountId(account.getId());
-        createMessage.setJwtToken(account.getJwtToken());
-        createMessage.setExpiration(DateTimeUtils.getSecondsBetweenDates(new Date(), expiredDate));
+        JwtTokenMessage.CreateMessage createMessage = JwtTokenMessage.CreateMessage.from(account, expireDate);
 
         LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_CREATE_JWT_TOKEN, createMessage);
 
