@@ -67,6 +67,7 @@ public class AuthServiceImplTest {
         void testLogin() {
             when(accountService.getAccount(anyString())).thenReturn(defaultAccount);
             when(jwtTokenProvider.createJwtToken(any())).thenReturn(TestAuthBuilder.TOKEN);
+            when(passwordEncoder.matches(any(), any())).thenReturn(true);
             when(accountService.update(any())).thenReturn(defaultAccount);
 
             Account returnAccount = authService.login(TestAccountBuilder.EMAIL, TestAccountBuilder.PASSWORD);

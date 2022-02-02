@@ -50,7 +50,7 @@ server:
 # kafka
 kafka:
   bootstrap:
-    addresses: ${spring.embedded.kafka.brokers}
+    addresses: ${spring.embedded.kafka.brokers:localhost:9092}
   consumer:
     groupId: auth
   test:
