@@ -57,7 +57,15 @@ public class JwtTokenMessageServiceImplTest extends SpringBootWebMvcTestSupport 
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    private EmbeddedKafkaBroker embeddedKafkaBroker = new EmbeddedKafkaBroker(2, true, 2, JwtTokenTopic.TOPIC_CREATE_JWT_TOKEN);
+    private EmbeddedKafkaBroker embeddedKafkaBroker = new EmbeddedKafkaBroker(
+            2,
+            true,
+            2,
+            JwtTokenTopic.TOPIC_CREATE_JWT_TOKEN,
+            JwtTokenTopic.TOPIC_REQUEST_JWT_TOKEN,
+            JwtTokenTopic.TOPIC_UPDATE_JWT_TOKEN,
+            JwtTokenTopic.TOPIC_DELETE_JWT_TOKEN
+    );
 
     private KafkaMessageListenerContainer<String, String> container;
 
@@ -66,10 +74,13 @@ public class JwtTokenMessageServiceImplTest extends SpringBootWebMvcTestSupport 
     @BeforeEach
     void setUp() {
 
+    }
+
+    private void configEmbeddedKafka(String topic) {
         Map<String, Object> consumerProperties = KafkaTestUtils.consumerProps("auth", "false", embeddedKafkaBroker);
 
         DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProperties);
-        ContainerProperties containerProperties = new ContainerProperties(JwtTokenTopic.TOPIC_CREATE_JWT_TOKEN);
+        ContainerProperties containerProperties = new ContainerProperties(topic);
         container = new KafkaMessageListenerContainer<>(consumerFactory, containerProperties);
 
         records = new LinkedBlockingDeque<>();
@@ -95,18 +106,47 @@ public class JwtTokenMessageServiceImplTest extends SpringBootWebMvcTestSupport 
         @Test
         @DisplayName("Success")
         void testCreateMessageForJwtTokenCache() throws InterruptedException, JsonProcessingException {
+            configEmbeddedKafka(JwtTokenTopic.TOPIC_CREATE_JWT_TOKEN);
+
             Account account = TestAccountBuilder.accountWithToken();
             Date expireDate = DateUtils.addMinutes(new Date(), 3);
 
-            JwtTokenMessage.CreateMessage createMessage = JwtTokenMessage.CreateMessage.from(account, expireDate);
+            JwtTokenMessage.CreateMessage createMessage = JwtTokenMessage.CreateMessage.from(account, null);
             String expectedMessage = objectMapper.writeValueAsString(createMessage);
 
-            when(jwtTokenProvider.getExpiredDate(any())).thenReturn(expireDate);
+            when(jwtTokenProvider.getExpiredDate(any())).thenReturn(null);
 
             jwtTokenMessageService.creteJwtTokenCache(account);
 
             ConsumerRecord<String, String> record = records.poll(10, TimeUnit.SECONDS);
 
+            assertThat(record).isNotNull();
+            assertThat(record.value()).isEqualTo(expectedMessage);
+            assertThat(record).has(key(null));
+        }
+    }
+
+    @Nested
+    @DisplayName("JwtToken Cache Update Message Test")
+    class JwtTokenCacheUpdateMessageTest {
+        @Test
+        @DisplayName("Success")
+        void testUpdateMessageForJwtTokenCache() throws JsonProcessingException, InterruptedException {
+            configEmbeddedKafka(JwtTokenTopic.TOPIC_UPDATE_JWT_TOKEN);
+
+            Account account = TestAccountBuilder.accountWithToken();
+            Date expireDate = DateUtils.addMinutes(new Date(), 3);
+
+            JwtTokenMessage.CreateMessage createMessage = JwtTokenMessage.CreateMessage.from(account, null);
+            String expectedMessage = objectMapper.writeValueAsString(createMessage);
+
+            when(jwtTokenProvider.getExpiredDate(any())).thenReturn(null);
+
+            jwtTokenMessageService.updateJwtTokenCache(account);
+
+            ConsumerRecord<String, String> record = records.poll(10, TimeUnit.SECONDS);
+
+            assertThat(record).isNotNull();
             assertThat(record.value()).isEqualTo(expectedMessage);
             assertThat(record).has(key(null));
         }

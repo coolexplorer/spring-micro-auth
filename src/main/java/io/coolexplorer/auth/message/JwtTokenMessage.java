@@ -64,10 +64,16 @@ public class JwtTokenMessage {
         private Long expiration = -1L;
 
         public static CreateMessage from(Account account, Date expireDate) {
+            Long expiration = -1L;
+
+            if (expireDate != null) {
+                expiration = DateTimeUtils.getSecondsBetweenDates(new Date(), expireDate);
+            }
+
             return new CreateMessage()
                     .setAccountId(account.getId())
                     .setJwtToken(account.getJwtToken())
-                    .setExpiration(DateTimeUtils.getSecondsBetweenDates(new Date(), expireDate));
+                    .setExpiration(expiration);
         }
     }
 
@@ -99,6 +105,19 @@ public class JwtTokenMessage {
 
         @Schema(example = "10L")
         private Long expiration = -1L;
+
+        public static UpdateMessage from(Account account, Date expireDate) {
+            Long expiration = -1L;
+
+            if (expireDate != null) {
+                expiration = DateTimeUtils.getSecondsBetweenDates(new Date(), expireDate);
+            }
+
+            return new UpdateMessage()
+                    .setAccountId(account.getId())
+                    .setJwtToken(account.getJwtToken())
+                    .setExpiration(expiration);
+        }
     }
 
     @Getter
