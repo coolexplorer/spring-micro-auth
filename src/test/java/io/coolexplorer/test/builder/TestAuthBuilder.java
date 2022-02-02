@@ -7,6 +7,7 @@ public class TestAuthBuilder {
     public static String EMAIL = "test@coolexplorer.io";
     public static String PASSWORD = "test";
     public static String TOKEN = "testToken";
+    public static Long EXPIRATION = 30L;
 
     public static AuthDTO.LoginRequest defaultLoginRequest() {
         return new AuthDTO.LoginRequest()

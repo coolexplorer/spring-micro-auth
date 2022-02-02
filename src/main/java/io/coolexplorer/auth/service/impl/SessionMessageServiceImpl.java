@@ -41,7 +41,7 @@ public class SessionMessageServiceImpl implements SessionMessageService {
 
     @Override
     public SessionMessage.SessionInfo retrieveSession(SessionMessage.RetrieveMessage message) throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
-        LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_RETRIEVE_JWT_TOKEN, message);
+        LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_REQUEST_JWT_TOKEN, message);
 
         ProducerRecord<String, Object> record = new ProducerRecord<>(SessionTopic.TOPIC_RETRIEVE_SESSION, message);
         RequestReplyFuture<String, Object, String> replyFuture = sessionReplyingKafkaTemplate.sendAndReceive(record);
