@@ -2,6 +2,8 @@ package io.coolexplorer.auth.message;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.coolexplorer.auth.model.Account;
+import io.coolexplorer.auth.utils.DateTimeUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +14,7 @@ import lombok.experimental.Accessors;
 import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -59,6 +62,19 @@ public class JwtTokenMessage {
 
         @Schema(example = "10L")
         private Long expiration = -1L;
+
+        public static CreateMessage from(Account account, Date expireDate) {
+            Long expiration = -1L;
+
+            if (expireDate != null) {
+                expiration = DateTimeUtils.getSecondsBetweenDates(new Date(), expireDate);
+            }
+
+            return new CreateMessage()
+                    .setAccountId(account.getId())
+                    .setJwtToken(account.getJwtToken())
+                    .setExpiration(expiration);
+        }
     }
 
     @Getter
@@ -89,6 +105,19 @@ public class JwtTokenMessage {
 
         @Schema(example = "10L")
         private Long expiration = -1L;
+
+        public static UpdateMessage from(Account account, Date expireDate) {
+            Long expiration = -1L;
+
+            if (expireDate != null) {
+                expiration = DateTimeUtils.getSecondsBetweenDates(new Date(), expireDate);
+            }
+
+            return new UpdateMessage()
+                    .setAccountId(account.getId())
+                    .setJwtToken(account.getJwtToken())
+                    .setExpiration(expiration);
+        }
     }
 
     @Getter

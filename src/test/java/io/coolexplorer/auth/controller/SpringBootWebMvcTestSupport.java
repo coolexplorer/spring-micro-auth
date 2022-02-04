@@ -10,20 +10,20 @@ import javax.validation.Validator;
 
 public class SpringBootWebMvcTestSupport {
     @Autowired
-    MockMvc mockMvc;
+    public MockMvc mockMvc;
 
     @Autowired
-    Validator validator;
+    public Validator validator;
 
     @Autowired
-    MessageSourceAccessor validationMessageSourceAccessor;
+    public MessageSourceAccessor validationMessageSourceAccessor;
 
     @Autowired
-    MessageSourceAccessor errorMessageSourceAccessor;
+    public MessageSourceAccessor errorMessageSourceAccessor;
 
     @Autowired
-    ObjectMapper objectMapper;
+    public ObjectMapper objectMapper;
 
     @Autowired
-    ModelMapper modelMapper;
+    public ModelMapper modelMapper;
 }
