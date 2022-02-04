@@ -50,9 +50,11 @@ server:
 # kafka
 kafka:
   bootstrap:
-    addresses: localhost:31090,localhost:31091,localhost:31092
+    addresses: ${spring.embedded.kafka.brokers:localhost:9092}
   consumer:
     groupId: auth
+  test:
+    topic: test.topic
 
 # logging
 logging:

@@ -2,7 +2,6 @@ package io.coolexplorer.auth.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jwt.util.DateUtils;
 import io.coolexplorer.auth.message.JwtTokenMessage;
 import io.coolexplorer.auth.model.Account;
 import io.coolexplorer.auth.security.JwtTokenProvider;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
@@ -38,12 +36,9 @@ public class JwtTokenMessageServiceImpl implements JwtTokenMessageService {
 
     @Override
     public void creteJwtTokenCache(Account account) {
-        Date expiredDate = jwtTokenProvider.getExpiredDate(account.getJwtToken());
+        Date expireDate = jwtTokenProvider.getExpiredDate(account.getJwtToken());
 
-        JwtTokenMessage.CreateMessage createMessage = new JwtTokenMessage.CreateMessage();
-        createMessage.setAccountId(account.getId());
-        createMessage.setJwtToken(account.getJwtToken());
-        createMessage.setExpiration(DateTimeUtils.getSecondsBetweenDates(new Date(), expiredDate));
+        JwtTokenMessage.CreateMessage createMessage = JwtTokenMessage.CreateMessage.from(account, expireDate);
 
         LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_CREATE_JWT_TOKEN, createMessage);
 
@@ -54,9 +49,9 @@ public class JwtTokenMessageServiceImpl implements JwtTokenMessageService {
 
     @Override
     public JwtTokenMessage.JwtTokenInfo getJwtTokenCache(JwtTokenMessage.RequestMessage message) throws ExecutionException, InterruptedException, TimeoutException, JsonProcessingException {
-        LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_RETRIEVE_JWT_TOKEN, message);
+        LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_REQUEST_JWT_TOKEN, message);
 
-        ProducerRecord<String, Object> record = new ProducerRecord<>(JwtTokenTopic.TOPIC_RETRIEVE_JWT_TOKEN, message);
+        ProducerRecord<String, Object> record = new ProducerRecord<>(JwtTokenTopic.TOPIC_REQUEST_JWT_TOKEN, message);
         RequestReplyFuture<String, Object, String> replyFuture = jwtTokenReplyingKafkaTemplate.sendAndReceive(record);
 
         SendResult<String, Object> sendResult = replyFuture.getSendFuture().get(10, TimeUnit.SECONDS);
@@ -70,12 +65,9 @@ public class JwtTokenMessageServiceImpl implements JwtTokenMessageService {
 
     @Override
     public void updateJwtTokenCache(Account account) {
-        Date expiredDate = jwtTokenProvider.getExpiredDate(account.getJwtToken());
+        Date expireDate = jwtTokenProvider.getExpiredDate(account.getJwtToken());
 
-        JwtTokenMessage.UpdateMessage updateMessage = new JwtTokenMessage.UpdateMessage();
-        updateMessage.setAccountId(account.getId());
-        updateMessage.setJwtToken(account.getJwtToken());
-        updateMessage.setExpiration(DateTimeUtils.getSecondsBetweenDates(new Date(), expiredDate));
+        JwtTokenMessage.UpdateMessage updateMessage = JwtTokenMessage.UpdateMessage.from(account, expireDate);
 
         LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_UPDATE_JWT_TOKEN, updateMessage);
 

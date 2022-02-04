@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.modelmapper.ModelMapper;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
@@ -62,10 +61,7 @@ public class SessionMessage {
     @NoArgsConstructor
     @ToString
     @Schema(description = "Session Retrieve Message")
-    public static class RetrieveMessage {
-        @Schema(example = "ff6681f0-50f8-4110-bf96-ef6cec45780e")
-        private String id;
-
+    public static class RequestMessage {
         @Schema(example = "1L")
         private Long accountId;
     }
@@ -96,9 +92,6 @@ public class SessionMessage {
     @ToString
     @Schema(description = "Session Deletion Message")
     public static class DeleteMessage {
-        @Schema(example = "ff6681f0-50f8-4110-bf96-ef6cec45780e")
-        private String id;
-
         @Schema(example = "1L")
         private Long accountId;
     }

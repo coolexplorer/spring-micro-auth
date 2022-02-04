@@ -7,8 +7,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 public interface SessionMessageService {
-    void createSession(SessionMessage.CreateMessage message);
-    SessionMessage.SessionInfo retrieveSession(SessionMessage.RetrieveMessage message) throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException;
-    void updateSession(SessionMessage.UpdateMessage message);
-    void deleteSession(SessionMessage.DeleteMessage message);
+    void createSession(Long accountId, String value, Long expiration);
+    SessionMessage.SessionInfo getSession(Long accountId) throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException;
+    void updateSession(Long accountId, String appendedValue, Long expiration);
+    void deleteSession(Long accountId);
 }
