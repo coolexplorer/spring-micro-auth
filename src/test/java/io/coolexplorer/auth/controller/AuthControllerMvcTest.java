@@ -7,6 +7,7 @@ import io.coolexplorer.auth.model.Account;
 import io.coolexplorer.auth.security.JwtTokenProvider;
 import io.coolexplorer.auth.service.AccountService;
 import io.coolexplorer.auth.service.AuthService;
+import io.coolexplorer.auth.service.JwtTokenMessageService;
 import io.coolexplorer.auth.utils.DateTimeUtils;
 import io.coolexplorer.test.builder.TestAccountBuilder;
 import io.coolexplorer.test.builder.TestAuthBuilder;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,6 +29,7 @@ import org.springframework.test.context.TestPropertySource;
 import java.util.Date;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,6 +50,9 @@ public class AuthControllerMvcTest extends SpringBootWebMvcTestSupport {
 
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private JwtTokenMessageService jwtTokenMessageService;
 
     Account defaultAccount;
 
@@ -94,6 +100,7 @@ public class AuthControllerMvcTest extends SpringBootWebMvcTestSupport {
             String expectedResponse = objectMapper.writeValueAsString(tokenInfo);
 
             when(authService.login(any(), any())).thenReturn(accountWithToken);
+            doNothing().when(jwtTokenMessageService).creteJwtTokenCache(any());
             when(jwtTokenProvider.getExpiredDate(any())).thenReturn(DateUtils.addMinutes(new Date(), 3));
 
             mockMvc.perform(post("/api/v1/login")
