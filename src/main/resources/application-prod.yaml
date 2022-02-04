@@ -44,6 +44,13 @@ server:
   version: '@project.version@'
   port: 8080
 
+# kafka
+kafka:
+  bootstrap:
+    addresses: kafka-headless.default.svc.cluster.local:9092
+  consumer:
+    groupId: auth
+
 # documentation
 springdoc:
   swagger-ui:
