@@ -31,7 +31,11 @@ public class SessionMessageServiceImpl implements SessionMessageService {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void createSession(SessionMessage.CreateMessage message) {
+    public void createSession(Long accountId, String value, Long expiration) {
+        SessionMessage.CreateMessage message = new SessionMessage.CreateMessage();
+        message.setAccountId(accountId);
+        message.setValues(value);
+        message.setExpiration(expiration);
         LOGGER.debug("topic = {}, payload = {}", SessionTopic.TOPIC_CREATE_SESSION, message);
 
         ListenableFuture<SendResult<String, Object>> listenableFuture = kafkaSessionTemplate.send(SessionTopic.TOPIC_CREATE_SESSION, message);
@@ -40,10 +44,13 @@ public class SessionMessageServiceImpl implements SessionMessageService {
     }
 
     @Override
-    public SessionMessage.SessionInfo retrieveSession(SessionMessage.RetrieveMessage message) throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
+    public SessionMessage.SessionInfo getSession(Long accountId) throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
+        SessionMessage.RequestMessage message = new SessionMessage.RequestMessage();
+        message.setAccountId(accountId);
+
         LOGGER.debug("topic = {}, payload = {}", JwtTokenTopic.TOPIC_REQUEST_JWT_TOKEN, message);
 
-        ProducerRecord<String, Object> record = new ProducerRecord<>(SessionTopic.TOPIC_RETRIEVE_SESSION, message);
+        ProducerRecord<String, Object> record = new ProducerRecord<>(SessionTopic.TOPIC_REQUEST_SESSION, message);
         RequestReplyFuture<String, Object, String> replyFuture = sessionReplyingKafkaTemplate.sendAndReceive(record);
 
         SendResult<String, Object> sendResult = replyFuture.getSendFuture().get(10, TimeUnit.SECONDS);
@@ -57,7 +64,11 @@ public class SessionMessageServiceImpl implements SessionMessageService {
     }
 
     @Override
-    public void updateSession(SessionMessage.UpdateMessage message) {
+    public void updateSession(Long accountId, String appendValue, Long expiration) {
+        SessionMessage.UpdateMessage message = new SessionMessage.UpdateMessage();
+        message.setAccountId(accountId);
+        message.setValues(appendValue);
+        message.setExpiration(expiration);
         LOGGER.debug("topic = {}, payload = {}", SessionTopic.TOPIC_UPDATE_SESSION, message);
 
         ListenableFuture<SendResult<String, Object>> listenableFuture = kafkaSessionTemplate.send(SessionTopic.TOPIC_UPDATE_SESSION, message);
@@ -66,7 +77,10 @@ public class SessionMessageServiceImpl implements SessionMessageService {
     }
 
     @Override
-    public void deleteSession(SessionMessage.DeleteMessage message) {
+    public void deleteSession(Long accountId) {
+        SessionMessage.DeleteMessage message = new SessionMessage.DeleteMessage();
+        message.setAccountId(accountId);
+
         LOGGER.debug("topic = {}, payload = {}", SessionTopic.TOPIC_DELETE_SESSION, message);
 
         ListenableFuture<SendResult<String, Object>> listenableFuture = kafkaSessionTemplate.send(SessionTopic.TOPIC_DELETE_SESSION, message);

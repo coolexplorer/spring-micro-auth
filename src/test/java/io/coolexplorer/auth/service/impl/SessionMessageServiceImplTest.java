@@ -3,14 +3,13 @@ package io.coolexplorer.auth.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.coolexplorer.auth.controller.SpringBootWebMvcTestSupport;
 import io.coolexplorer.auth.message.JwtTokenMessage;
-import io.coolexplorer.auth.model.Account;
-import io.coolexplorer.auth.security.JwtTokenProvider;
-import io.coolexplorer.auth.service.JwtTokenMessageService;
+import io.coolexplorer.auth.message.SessionMessage;
+import io.coolexplorer.auth.service.SessionMessageService;
 import io.coolexplorer.auth.topic.JwtTokenTopic;
+import io.coolexplorer.auth.topic.SessionTopic;
 import io.coolexplorer.test.builder.TestAccountBuilder;
 import io.coolexplorer.test.builder.TestAuthBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -26,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
@@ -41,7 +39,6 @@ import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -51,8 +48,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.kafka.test.assertj.KafkaConditions.key;
 
 @Slf4j
@@ -61,23 +56,20 @@ import static org.springframework.kafka.test.assertj.KafkaConditions.key;
 @EmbeddedKafka
 @AutoConfigureMockMvc
 @TestPropertySource(properties = "spring.config.location=classpath:application-test.yaml")
-public class JwtTokenMessageServiceImplTest extends SpringBootWebMvcTestSupport {
+public class SessionMessageServiceImplTest extends SpringBootWebMvcTestSupport {
     @Autowired
-    private JwtTokenMessageService jwtTokenMessageService;
-
-    @MockBean
-    private JwtTokenProvider jwtTokenProvider;
+    private SessionMessageService sessionMessageService;
 
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker = new EmbeddedKafkaBroker(
             2,
             true,
             2,
-            JwtTokenTopic.TOPIC_CREATE_JWT_TOKEN,
-            JwtTokenTopic.TOPIC_REQUEST_JWT_TOKEN,
-            JwtTokenTopic.TOPIC_UPDATE_JWT_TOKEN,
-            JwtTokenTopic.TOPIC_DELETE_JWT_TOKEN,
-            JwtTokenTopic.TOPIC_REPLY_JWT_TOKEN
+            SessionTopic.TOPIC_CREATE_SESSION,
+            SessionTopic.TOPIC_UPDATE_SESSION,
+            SessionTopic.TOPIC_REQUEST_SESSION,
+            SessionTopic.TOPIC_DELETE_SESSION,
+            SessionTopic.TOPIC_REPLY_SESSION
     );
 
     private KafkaMessageListenerContainer<String, String> container;
@@ -88,7 +80,7 @@ public class JwtTokenMessageServiceImplTest extends SpringBootWebMvcTestSupport 
     void setUp() {}
 
     private void configEmbeddedKafkaConsumer(String topic) {
-        Map<String, Object> consumerProperties = new HashMap<>(KafkaTestUtils.consumerProps("auth", "false", embeddedKafkaBroker));
+        Map<String, Object> consumerProperties = new HashMap<>(KafkaTestUtils.consumerProps("session", "false", embeddedKafkaBroker));
 
         DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProperties);
 
@@ -98,9 +90,9 @@ public class JwtTokenMessageServiceImplTest extends SpringBootWebMvcTestSupport 
         records = new LinkedBlockingDeque<>();
 
         container.setupMessageListener((MessageListener<String, String>) record -> {
-                    LOGGER.debug("test-listener received message='{}'",
-                            record.value());
-                    records.add(record);
+            LOGGER.debug("test-listener received message='{}'",
+                    record.value());
+            records.add(record);
         });
         container.start();
 
@@ -118,21 +110,20 @@ public class JwtTokenMessageServiceImplTest extends SpringBootWebMvcTestSupport 
     }
 
     @Nested
-    @DisplayName("JwtToken Cache Creation Message Test")
-    class JwtTokenCacheCreationMessageTest {
+    @DisplayName("Session Cache Creation Message Test")
+    class SessionCacheCreationMessageTest {
         @Test
         @DisplayName("Success")
-        void testCreateMessageForJwtTokenCache() throws InterruptedException, JsonProcessingException {
-            configEmbeddedKafkaConsumer(JwtTokenTopic.TOPIC_CREATE_JWT_TOKEN);
+        void  testCreateMessageForSessionCache() throws InterruptedException, JsonProcessingException {
+            configEmbeddedKafkaConsumer(SessionTopic.TOPIC_CREATE_SESSION);
 
-            Account account = TestAccountBuilder.accountWithToken();
+            SessionMessage.CreateMessage createMessage = new SessionMessage.CreateMessage();
+            createMessage.setAccountId(TestAccountBuilder.ID);
+            createMessage.setValues("test");
 
-            JwtTokenMessage.CreateMessage createMessage = JwtTokenMessage.CreateMessage.from(account, null);
             String expectedMessage = objectMapper.writeValueAsString(createMessage);
 
-            when(jwtTokenProvider.getExpiredDate(any())).thenReturn(null);
-
-            jwtTokenMessageService.creteJwtTokenCache(account);
+            sessionMessageService.createSession(createMessage.getAccountId(), createMessage.getValues(), -1L);
 
             ConsumerRecord<String, String> record = records.poll(10, TimeUnit.SECONDS);
 
@@ -143,21 +134,20 @@ public class JwtTokenMessageServiceImplTest extends SpringBootWebMvcTestSupport 
     }
 
     @Nested
-    @DisplayName("JwtToken Cache Update Message Test")
-    class JwtTokenCacheUpdateMessageTest {
+    @DisplayName("Session Cache Update Message Test")
+    class SessionCacheUpdateMessageTest {
         @Test
         @DisplayName("Success")
-        void testUpdateMessageForJwtTokenCache() throws JsonProcessingException, InterruptedException {
-            configEmbeddedKafkaConsumer(JwtTokenTopic.TOPIC_UPDATE_JWT_TOKEN);
+        void testUpdateMessageForSessionCache() throws InterruptedException, JsonProcessingException {
+            configEmbeddedKafkaConsumer(SessionTopic.TOPIC_UPDATE_SESSION);
 
-            Account account = TestAccountBuilder.accountWithToken();
+            SessionMessage.UpdateMessage updateMessage = new SessionMessage.UpdateMessage();
+            updateMessage.setAccountId(TestAccountBuilder.ID);
+            updateMessage.setValues("test");
 
-            JwtTokenMessage.UpdateMessage updateMessage = JwtTokenMessage.UpdateMessage.from(account, null);
             String expectedMessage = objectMapper.writeValueAsString(updateMessage);
 
-            when(jwtTokenProvider.getExpiredDate(any())).thenReturn(null);
-
-            jwtTokenMessageService.updateJwtTokenCache(account);
+            sessionMessageService.updateSession(updateMessage.getAccountId(), updateMessage.getValues(), -1L);
 
             ConsumerRecord<String, String> record = records.poll(10, TimeUnit.SECONDS);
 
@@ -168,29 +158,29 @@ public class JwtTokenMessageServiceImplTest extends SpringBootWebMvcTestSupport 
     }
 
     @Nested
-    @DisplayName("JwtToken Cache Request Message Test")
-    class JwtTokenCacheRequestMessageTest {
+    @DisplayName("Session Cache Request Message Test")
+    class SessionCacheRequestMessageTest {
         @Test
         @DisplayName("Success")
         @Disabled("Cannot make the replying message with Embedded kafka")
-        void testRequestMessageForJwtTokenCache() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
-            configEmbeddedKafkaConsumer(JwtTokenTopic.TOPIC_REQUEST_JWT_TOKEN);
+        void testRequestMessageForSessionCache() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
+            configEmbeddedKafkaConsumer(SessionTopic.TOPIC_REQUEST_SESSION);
 
-            JwtTokenMessage.RequestMessage requestMessage = new JwtTokenMessage.RequestMessage();
+            SessionMessage.RequestMessage requestMessage = new SessionMessage.RequestMessage();
             requestMessage.setAccountId(TestAccountBuilder.ID);
             String expectedMessage = objectMapper.writeValueAsString(requestMessage);
 
-            JwtTokenMessage.JwtTokenInfo jwtTokenInfo = new JwtTokenMessage.JwtTokenInfo();
-            jwtTokenInfo.setJwtToken(TestAuthBuilder.TOKEN);
-            String replayMessage = objectMapper.writeValueAsString(jwtTokenInfo);
+            SessionMessage.SessionInfo sessionInfo = new SessionMessage.SessionInfo();
+            sessionInfo.setValues("test");
+            String replayMessage = objectMapper.writeValueAsString(sessionInfo);
 
             Producer<String, Object> producer = configEmbeddedKafkaProducer();
-            ProducerRecord<String, Object> producerRecord = new ProducerRecord<>(JwtTokenTopic.TOPIC_REPLY_JWT_TOKEN, replayMessage);
-            producerRecord.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, JwtTokenTopic.TOPIC_REPLY_JWT_TOKEN.getBytes()));
+            ProducerRecord<String, Object> producerRecord = new ProducerRecord<>(SessionTopic.TOPIC_REPLY_SESSION, replayMessage);
+            producerRecord.headers().add(new RecordHeader(KafkaHeaders.REPLY_TOPIC, SessionTopic.TOPIC_REPLY_SESSION.getBytes()));
             producer.send(producerRecord);
             producer.flush();
 
-            jwtTokenMessageService.getJwtTokenCache(requestMessage);
+            sessionMessageService.getSession(requestMessage.getAccountId());
 
             ConsumerRecord<String, String> record = records.poll(10, TimeUnit.SECONDS);
 
@@ -203,18 +193,18 @@ public class JwtTokenMessageServiceImplTest extends SpringBootWebMvcTestSupport 
     }
 
     @Nested
-    @DisplayName("JwtToken Cache Delete Message Test")
-    class JwtTokenCacheDeleteMessageTest {
+    @DisplayName("Session Cache Delete Message Test")
+    class SessionCacheDeleteMessageTest {
         @Test
         @DisplayName("Success")
-        void testDeleteMessageForJwtTokenCache() throws JsonProcessingException, InterruptedException {
-            configEmbeddedKafkaConsumer(JwtTokenTopic.TOPIC_DELETE_JWT_TOKEN);
+        void testDeleteMessageForSessionCache() throws JsonProcessingException, InterruptedException {
+            configEmbeddedKafkaConsumer(SessionTopic.TOPIC_DELETE_SESSION);
 
-            JwtTokenMessage.DeleteMessage deleteMessage = new JwtTokenMessage.DeleteMessage();
+            SessionMessage.DeleteMessage deleteMessage = new SessionMessage.DeleteMessage();
             deleteMessage.setAccountId(TestAccountBuilder.ID);
             String expectedMessage = objectMapper.writeValueAsString(deleteMessage);
 
-            jwtTokenMessageService.deleteJwtTokenCache(TestAccountBuilder.ID);
+            sessionMessageService.deleteSession(TestAccountBuilder.ID);
 
             ConsumerRecord<String, String> record = records.poll(10, TimeUnit.SECONDS);
 
