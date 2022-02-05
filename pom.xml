@@ -4,7 +4,7 @@
 
     <artifactId>spring-micro-auth</artifactId>
     <groupId>io.coolexplorer</groupId>
-    <version>0.1.9</version>
+    <version>0.1.10-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>spring-micro-auth</name>
 
