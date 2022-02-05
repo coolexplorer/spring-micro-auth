@@ -25,7 +25,7 @@ public class EncryptTest {
         @DisplayName("Generate Encrypted & Decrypted String")
         @Disabled("Disabled")
         void generateEncryptStringTest() {
-            LOGGER.debug("Text: {}, Encrypted Text: {}", "test", jasyptEncoding("test"));
+            LOGGER.debug("Text: {}, Encrypted Text: {}", "password", jasyptEncoding("password"));
             LOGGER.debug("Text: {}, Decrypted Text: {}", "iHDqZi0NsMTAUUseSSXD+Q==", jasyptDecoding("iHDqZi0NsMTAUUseSSXD+Q=="));
         }
     }
