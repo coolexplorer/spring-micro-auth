@@ -37,6 +37,7 @@ spring:
       mode: always
       continue-on-error: false
       platform: postgresql
+      data-locations: classpath:data-postgres.sql
 
 # server
 server:
