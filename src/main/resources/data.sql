@@ -1,7 +1,7 @@
 INSERT INTO role (role_name, description, modified_date, created_date)
-VALUES ('ROLE_ADMIN', 'Administrator', CURRENT_TIMESTAMP (), CURRENT_TIMESTAMP());
+VALUES ('ROLE_ADMIN', 'Administrator', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());
 INSERT INTO role (role_name, description, modified_date, created_date)
-VALUES ('ROLE_USER', 'User', CURRENT_TIMESTAMP (), CURRENT_TIMESTAMP());
+VALUES ('ROLE_USER', 'User', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());
 
 INSERT INTO account (email, password, first_name, last_name, created_date, modified_date)
 VALUES ('admin@coolexplorer.io', '$2a$10$2/GCd0eV1rjS3SUaSqTmZe2KnX40vNPJQtU3mawtoGWi9NBbjX1oO', 'John', 'Kim', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());
