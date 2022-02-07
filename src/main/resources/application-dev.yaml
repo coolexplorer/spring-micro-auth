@@ -22,9 +22,9 @@ spring:
     console:
       enabled: false
   datasource:
-    url: jdbc:postgresql://localhost:5432/auth
-    username: ENC(HoNk6ktJqFL3m1SlToHX8riunI5G8BUM)
-    password: ENC(BMVk0F3/+SmnLhHdQkNoKHd2UaC0uNVi)
+    url: jdbc:postgresql://localhost:30432/auth
+    username: ENC(87N1B0jWzzNM0Y5NiUjmgyLTzoQGWeEr)
+    password: ENC(32mylwDjuYN9IizAN1RoXVNNtnBpfrA0)
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: org.postgresql.Driver
     hikari:
@@ -36,7 +36,8 @@ spring:
     init:
       mode: always
       continue-on-error: false
-      platform: h2
+      platform: postgresql
+      data-locations: classpath:data-postgres.sql
 
 # server
 server:
