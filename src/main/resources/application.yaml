@@ -51,7 +51,7 @@ server:
 # kafka
 kafka:
   bootstrap:
-    addresses: localhost:29092
+    addresses: localhost:9092
   consumer:
     groupId: auth
 

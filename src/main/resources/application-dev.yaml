@@ -1,3 +1,4 @@
+# spring
 spring:
   application:
     name: auth
@@ -22,7 +23,7 @@ spring:
     console:
       enabled: false
   datasource:
-    url: jdbc:postgresql://localhost:30432/auth
+    url: jdbc:postgresql://localhost:5432/auth
     username: ENC(87N1B0jWzzNM0Y5NiUjmgyLTzoQGWeEr)
     password: ENC(32mylwDjuYN9IizAN1RoXVNNtnBpfrA0)
     type: com.zaxxer.hikari.HikariDataSource
@@ -43,7 +44,14 @@ spring:
 server:
   title: spring-micro-auth
   version: '@project.version@'
-  port: 8080
+  port: 8180
+
+# kafka
+kafka:
+  bootstrap:
+    addresses: localhost:9092
+  consumer:
+    groupId: auth
 
 # documentation
 springdoc:
