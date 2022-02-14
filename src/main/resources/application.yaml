@@ -46,7 +46,7 @@ spring:
 server:
   title: spring-micro-auth
   version: '@project.version@'
-  port: 8080
+  port: 8180
 
 # kafka
 kafka:
