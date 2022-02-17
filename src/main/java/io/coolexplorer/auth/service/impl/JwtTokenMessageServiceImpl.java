@@ -13,10 +13,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.aspectj.apache.bcel.generic.LOOKUPSWITCH;
+import org.modelmapper.ModelMapper;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 import org.springframework.kafka.requestreply.RequestReplyFuture;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
@@ -31,8 +37,9 @@ import java.util.concurrent.TimeoutException;
 public class JwtTokenMessageServiceImpl implements JwtTokenMessageService {
     private final KafkaTemplate<String, Object> kafkaJwtTokenTemplate;
     private final ReplyingKafkaTemplate<String, Object, String> jwtTokenReplyingKafkaTemplate;
-    private final ObjectMapper objectMapper;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ObjectMapper objectMapper;
+    private final ModelMapper modelMapper;
 
     @Override
     public void creteJwtTokenCache(Account account) {
@@ -86,5 +93,25 @@ public class JwtTokenMessageServiceImpl implements JwtTokenMessageService {
         ListenableFuture<SendResult<String, Object>> listenableFuture = kafkaJwtTokenTemplate.send(JwtTokenTopic.TOPIC_DELETE_JWT_TOKEN, deleteMessage);
 
         listenableFuture.addCallback(new JwtTokenFutureCallback(deleteMessage));
+    }
+
+    @Override
+    @KafkaListener(
+            topics = JwtTokenTopic.TOPIC_VALIDATE_JWT_TOKEN,
+            groupId = "${kafka.consumer.groupId}",
+            containerFactory = "jwtTokenKafkaListenerContainerFactory")
+    @SendTo(JwtTokenTopic.TOPIC_VALIDATE_RESULT_JWT_TOKEN)
+    public JwtTokenMessage.ValidateResultMessage listenValidateJwtToken(@Payload ConsumerRecord<String, String> record, Acknowledgment ack) throws JsonProcessingException {
+        LOGGER.debug("received message from '{}' : {}", record.topic(), record.value());
+
+        JwtTokenMessage.ValidateMessage validateMessage = objectMapper.readValue(record.value(), JwtTokenMessage.ValidateMessage.class);
+        ack.acknowledge();
+
+        JwtTokenMessage.ValidateResultMessage resultMessage = modelMapper.map(validateMessage, JwtTokenMessage.ValidateResultMessage.class);
+        resultMessage.setResult(jwtTokenProvider.isValid(validateMessage.getJwtToken(), null));
+
+        LOGGER.debug("Jwt Validation Result : {}", resultMessage.getResult());
+
+        return resultMessage;
     }
 }

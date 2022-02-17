@@ -92,6 +92,7 @@ public class KafkaJwtTokenConfig {
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> jwtTokenKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         factory.setConsumerFactory(jwtTokenConsumerFactory());
         factory.setReplyTemplate(kafkaJwtTokenTemplate());
         return factory;
