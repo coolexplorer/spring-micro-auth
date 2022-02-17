@@ -49,12 +49,12 @@ public class RestResponseEntityExceptionHandler {
     protected ResponseEntity<ErrorResponse> handlerAuthenticationException(AuthenticationException e) {
         LOGGER.error(e.getLocalizedMessage(), e);
 
-        ErrorResponse response = createAuthenticationReponse(e);
+        ErrorResponse response = createAuthenticationResponse(e);
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    private ErrorResponse createAuthenticationReponse(AuthenticationException e) {
+    private ErrorResponse createAuthenticationResponse(AuthenticationException e) {
         ErrorResponse errorResponse = null;
 
         if (e instanceof BadCredentialsException) {

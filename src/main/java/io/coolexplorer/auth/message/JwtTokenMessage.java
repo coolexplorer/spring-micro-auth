@@ -131,4 +131,30 @@ public class JwtTokenMessage {
         @Schema(example = "1L")
         private Long accountId;
     }
+
+    @Getter
+    @Setter
+    @Accessors(chain = true)
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    @Schema(description = "JwtToken Validation message")
+    public static class ValidateMessage {
+        @Schema(example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.....")
+        private String jwtToken;
+    }
+
+    @Getter
+    @Setter
+    @Accessors(chain = true)
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    @Schema(description = "JwtToken Validation Result message")
+    public static class ValidateResultMessage {
+        @Schema(example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.....")
+        private String jwtToken;
+        @Schema(example = "true|false")
+        private Boolean result;
+    }
 }

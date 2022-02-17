@@ -46,12 +46,12 @@ spring:
 server:
   title: spring-micro-auth
   version: '@project.version@'
-  port: 8080
+  port: 8180
 
 # kafka
 kafka:
   bootstrap:
-    addresses: localhost:29092
+    addresses: localhost:9092
   consumer:
     groupId: auth
 
