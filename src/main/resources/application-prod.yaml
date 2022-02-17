@@ -22,7 +22,7 @@ spring:
     console:
       enabled: false
   datasource:
-    url: jdbc:postgresql://postgresql.default.svc.cluster.local:5432/auth
+    url: jdbc:postgresql://${POSTGRESQL_HOST:postgresql.default.svc.cluster.local}:${POSTGRESQL_PORT:5432}/auth
     username: ENC(87N1B0jWzzNM0Y5NiUjmgyLTzoQGWeEr)
     password: ENC(32mylwDjuYN9IizAN1RoXVNNtnBpfrA0)
     type: com.zaxxer.hikari.HikariDataSource
