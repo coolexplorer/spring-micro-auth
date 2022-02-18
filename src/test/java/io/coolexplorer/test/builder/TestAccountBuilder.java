@@ -1,6 +1,7 @@
 package io.coolexplorer.test.builder;
 
 import io.coolexplorer.auth.dto.AccountDTO;
+import io.coolexplorer.auth.enums.RoleType;
 import io.coolexplorer.auth.model.Account;
 
 public class TestAccountBuilder {
@@ -39,6 +40,7 @@ public class TestAccountBuilder {
                 .setEmail(EMAIL)
                 .setFirstName(FIRST_NAME)
                 .setLastName(LAST_NAME)
-                .setPassword(PASSWORD);
+                .setPassword(PASSWORD)
+                .setRole(RoleType.ROLE_USER.getName());
     }
 }

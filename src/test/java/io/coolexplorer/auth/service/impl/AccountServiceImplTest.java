@@ -5,6 +5,7 @@ import io.coolexplorer.auth.exceptions.user.UserNotFoundException;
 import io.coolexplorer.auth.model.Account;
 import io.coolexplorer.auth.repository.AccountRepository;
 import io.coolexplorer.auth.service.AccountService;
+import io.coolexplorer.auth.service.RoleService;
 import io.coolexplorer.test.builder.TestAccountBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,9 @@ public class AccountServiceImplTest {
     private AccountRepository accountRepository;
 
     @Mock
+    private RoleService roleService;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
 
     private AccountService accountService;
@@ -42,6 +46,7 @@ public class AccountServiceImplTest {
     void setUp() {
         accountService = new AccountServiceImpl(
                 accountRepository,
+                roleService,
                 passwordEncoder
         );
 
