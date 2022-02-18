@@ -17,6 +17,7 @@ public class TestAccountBuilder {
                 .setPassword(PASSWORD)
                 .setFirstName(FIRST_NAME)
                 .setLastName(LAST_NAME)
+                .addRole(TestRoleBuilder.adminRole())
                 .addRole(TestRoleBuilder.userRole());
     }
 
