@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -81,6 +82,10 @@ public class JwtTokenProvider {
 
     public String getEmail(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public List<String> getRoles(String token) {
+        return (List<String>)Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("roles");
     }
 
     public Date getExpiredDate(String token) {
