@@ -1,6 +1,7 @@
 package io.coolexplorer.auth.service.impl;
 
 import io.coolexplorer.auth.enums.ExceptionCode;
+import io.coolexplorer.auth.enums.RoleType;
 import io.coolexplorer.auth.exceptions.user.UserDataIntegrityViolationException;
 import io.coolexplorer.auth.exceptions.user.UserNotFoundException;
 import io.coolexplorer.auth.message.JwtTokenMessage;
@@ -9,6 +10,7 @@ import io.coolexplorer.auth.security.JwtTokenProvider;
 import io.coolexplorer.auth.service.AccountService;
 import io.coolexplorer.auth.service.AuthService;
 import io.coolexplorer.auth.service.JwtTokenMessageService;
+import io.coolexplorer.auth.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -25,6 +27,7 @@ import java.time.LocalDateTime;
 @Service
 public class AuthServiceImpl implements AuthService {
     private final AccountService accountService;
+    private final RoleService roleService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final MessageSourceAccessor errorMessageSourceAccessor;
@@ -50,7 +53,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Account signup(Account account) throws UserDataIntegrityViolationException {
+    public Account signup(Account account, RoleType roleType) throws UserDataIntegrityViolationException {
+        account.addRole(roleService.getRole(roleType.getName()));
         return accountService.create(account);
     }
 

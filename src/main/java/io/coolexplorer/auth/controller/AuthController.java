@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.coolexplorer.auth.dto.AccountDTO;
 import io.coolexplorer.auth.dto.AuthDTO;
 import io.coolexplorer.auth.dto.ErrorResponse;
+import io.coolexplorer.auth.enums.RoleType;
 import io.coolexplorer.auth.message.JwtTokenMessage;
 import io.coolexplorer.auth.message.SessionMessage;
 import io.coolexplorer.auth.exceptions.user.UserDataIntegrityViolationException;
@@ -50,7 +51,7 @@ public class AuthController {
     @PostMapping("/signup")
     public AccountDTO.AccountInfo createAccount(@Valid @RequestBody AccountDTO.AccountCreationRequest request) throws UserDataIntegrityViolationException, ExecutionException, JsonProcessingException, InterruptedException, TimeoutException {
         Account account = modelMapper.map(request, Account.class);
-        Account createdAccount = authService.signup(account);
+        Account createdAccount = authService.signup(account, RoleType.ROLE_USER);
 
         return AccountDTO.AccountInfo.from(createdAccount, modelMapper);
     }

@@ -1,11 +1,13 @@
 package io.coolexplorer.auth.service.impl;
 
+import io.coolexplorer.auth.enums.RoleType;
 import io.coolexplorer.auth.exceptions.user.UserDataIntegrityViolationException;
 import io.coolexplorer.auth.exceptions.user.UserNotFoundException;
 import io.coolexplorer.auth.model.Account;
 import io.coolexplorer.auth.security.JwtTokenProvider;
 import io.coolexplorer.auth.service.AccountService;
 import io.coolexplorer.auth.service.AuthService;
+import io.coolexplorer.auth.service.RoleService;
 import io.coolexplorer.test.builder.TestAccountBuilder;
 import io.coolexplorer.test.builder.TestAuthBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,9 @@ public class AuthServiceImplTest {
     private AccountService accountService;
 
     @Mock
+    private RoleService roleService;
+
+    @Mock
     private JwtTokenProvider jwtTokenProvider;
 
     @Mock
@@ -50,6 +55,7 @@ public class AuthServiceImplTest {
     void setUp() {
         authService = new AuthServiceImpl(
                 accountService,
+                roleService,
                 jwtTokenProvider,
                 passwordEncoder,
                 errorMessageSourceAccessor
@@ -84,7 +90,7 @@ public class AuthServiceImplTest {
         void testSignUp() throws UserDataIntegrityViolationException {
             when(accountService.create(any())).thenReturn(defaultAccount);
 
-            Account createdAccount = authService.signup(dtoAccount);
+            Account createdAccount = authService.signup(dtoAccount, RoleType.ROLE_USER);
 
             AssertionsForClassTypes.assertThat(createdAccount).isNotNull().isEqualTo(defaultAccount);
         }

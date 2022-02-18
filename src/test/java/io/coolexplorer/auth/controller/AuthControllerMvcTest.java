@@ -70,7 +70,7 @@ public class AuthControllerMvcTest extends SpringBootWebMvcTestSupport {
             AccountDTO.AccountInfo accountInfo = AccountDTO.AccountInfo.from(defaultAccount, modelMapper);
             AccountDTO.AccountCreationRequest accountCreationRequest = TestAccountBuilder.defaultCreationRequest();
 
-            when(authService.signup(any())).thenReturn(defaultAccount);
+            when(authService.signup(any(), any())).thenReturn(defaultAccount);
 
             String payload = objectMapper.writeValueAsString(accountCreationRequest);
             String expectedResponse = objectMapper.writeValueAsString(accountInfo);

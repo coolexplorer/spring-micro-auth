@@ -2,13 +2,21 @@ package io.coolexplorer.auth.service.impl;
 
 import io.coolexplorer.auth.exceptions.user.UserDataIntegrityViolationException;
 import io.coolexplorer.auth.exceptions.user.UserNotFoundException;
+import io.coolexplorer.auth.filter.AccountSearchFilter;
 import io.coolexplorer.auth.model.Account;
+import io.coolexplorer.auth.model.Role;
 import io.coolexplorer.auth.model.SecureAccount;
 import io.coolexplorer.auth.repository.AccountRepository;
 import io.coolexplorer.auth.service.AccountService;
+import io.coolexplorer.auth.service.RoleService;
+import io.coolexplorer.auth.specification.AccountListSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,6 +30,7 @@ import java.util.Optional;
 @Service
 public class AccountServiceImpl implements AccountService, UserDetailsService {
     private final AccountRepository accountRepository;
+    private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -51,6 +60,17 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         }
 
         return account;
+    }
+
+    @Override
+    public Page<Account> getAccounts(AccountSearchFilter filter) {
+        Pageable pageRequest = PageRequest.of(filter.getPage(), filter.getItemsPerPage());
+
+        if (StringUtils.isNotEmpty(filter.getRole())) {
+            Role role = roleService.getRole(filter.getRole());
+            filter.setRoleId(role.getId());
+        }
+        return accountRepository.findAll(new AccountListSpecification(filter), pageRequest);
     }
 
     @Override
