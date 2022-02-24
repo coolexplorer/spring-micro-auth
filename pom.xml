@@ -54,7 +54,7 @@
         <modelMapper.version>2.4.5</modelMapper.version>
 
         <jjwt.version>0.9.1</jjwt.version>
-        <jasypt.version>3.0.3</jasypt.version>
+        <jasypt.version>3.0.4</jasypt.version>
 
         <!-- Jgit Configuration -->
         <git.user> </git.user>
