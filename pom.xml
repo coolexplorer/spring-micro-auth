@@ -51,7 +51,7 @@
         <openapi.version>1.6.6</openapi.version>
         <logback.version>1.2.10</logback.version>
         <lombok.version>1.18.22</lombok.version>
-        <modelMapper.version>2.4.5</modelMapper.version>
+        <modelMapper.version>3.0.0</modelMapper.version>
 
         <jjwt.version>0.9.1</jjwt.version>
         <jasypt.version>3.0.4</jasypt.version>
